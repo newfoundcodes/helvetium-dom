@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "skipLibCheck": true,
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    "noEmit": true,
+    "paths": {
+      "@newfoundcodes/helvetium-dom": ["./src/index.ts"],
+      "@newfoundcodes/helvetium-dom/server": ["./src/server.ts"],
+      "@newfoundcodes/helvetium-dom/router": ["./src/router.ts"]
+    }
+  },
+  "include": ["**/*.tsx"],
+  "exclude": ["node_modules"]
+}

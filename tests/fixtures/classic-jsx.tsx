@@ -22,7 +22,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type VNode } from '../../dist/index.js';
+import { Fragment, h, type VNode } from '../../dist/index.js';
+import type { JSX as HelvetiumJSX } from '../../type/jsx-runtime.js';
+
+declare global {
+  namespace JSX {
+    type Element = HelvetiumJSX.Element;
+    type ElementType = HelvetiumJSX.ElementType;
+    interface ElementChildrenAttribute extends HelvetiumJSX.ElementChildrenAttribute {}
+    interface IntrinsicAttributes extends HelvetiumJSX.IntrinsicAttributes {}
+    type IntrinsicElements = HelvetiumJSX.IntrinsicElements;
+  }
+}
 
 function Greeting({ name }: { name: string }): VNode {
   return (

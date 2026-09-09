@@ -2,7 +2,7 @@
   <img src="https://github.com/newfoundcodes/newfoundcodes-logo/blob/main/newfoundcodes-helvetium.png?raw=true" width="128" />
   <h1>Helvetium DOM</h1>
   <p>
-    <a href="https://github.com/newfoundcodes/helvetium-alps/actions"><img src="https://github.com/newfoundcodes/helvetium-alps/actions/workflows/ci.yml/badge.svg" alt="Build Status"></a>
+    <a href="https://github.com/newfoundcodes/helvetium-dom/actions"><img src="https://github.com/newfoundcodes/helvetium-dom/actions/workflows/ci.yml/badge.svg" alt="Build Status"></a>
   </p>
 </div>
 

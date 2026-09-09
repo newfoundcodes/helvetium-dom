@@ -1,0 +1,84 @@
+{
+  "name": "@newfoundcodes/helvetium-dom",
+  "version": "0.1.0",
+  "description": "Helvetium DOM is an independent TypeScript virtual DOM runtime with components, hooks, server-safe and browser routing, Anchor navigation markers, keyed reconciliation, portals, TSX, SSR, and hydration.",
+  "type": "module",
+  "sideEffects": false,
+  "license": "AGPL-3.0-only",
+  "files": [
+    "dist",
+    "type",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./jsx-runtime": {
+      "types": "./dist/jsx-runtime.d.ts",
+      "import": "./dist/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./dist/jsx-dev-runtime.d.ts",
+      "import": "./dist/jsx-dev-runtime.js"
+    },
+    "./router": {
+      "types": "./dist/router.d.ts",
+      "import": "./dist/router.js"
+    },
+    "./package.json": "./package.json",
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    }
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "clean": "rm -rf dist coverage playwright-report test-results site",
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "examples:typecheck": "tsc -p examples/tsconfig.json --noEmit",
+    "test:node": "npm run build && npm run examples:typecheck && node --test tests/*.test.mjs",
+    "test:playwright": "npm run build && playwright test",
+    "test:playwright:chromium": "npm run build && playwright test --project=chromium",
+    "test": "npm run test:node && npm run test:playwright",
+    "test:watch": "playwright test --ui",
+    "coverage": "npm run build && node --experimental-test-coverage --test tests/*.test.mjs",
+    "prepublishOnly": "npm run typecheck && npm run examples:typecheck && npm run test:node"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.4.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "eslint": "^10.10.0",
+    "prettier": "^3.9.6",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.69.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "helvetium",
+    "helvetium-dom",
+    "virtual-dom",
+    "vdom",
+    "typescript",
+    "jsx",
+    "jsx-factory",
+    "frontend",
+    "ui",
+    "router",
+    "routing",
+    "spa",
+    "history-api",
+    "anchor"
+  ]
+}

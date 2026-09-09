@@ -6,14 +6,16 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "strict": true,
     "skipLibCheck": true,
-    "jsx": "react",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@newfoundcodes/helvetium-dom",
     "noEmit": true,
     "paths": {
-      "@newfoundcodes/helvetium-dom": ["./src/index.ts"],
-      "@newfoundcodes/helvetium-dom/server": ["./src/server.ts"],
-      "@newfoundcodes/helvetium-dom/router": ["./src/router.ts"]
+      "@newfoundcodes/helvetium-dom": ["../src/index.ts"],
+      "@newfoundcodes/helvetium-dom/*": ["../src/*"],
+      "@newfoundcodes/helvetium-dom/jsx-runtime": ["../src/jsx-runtime.ts"],
+      "@newfoundcodes/helvetium-dom/jsx-dev-runtime": ["../src/jsx-dev-runtime.ts"],
+      "@newfoundcodes/helvetium-dom/server": ["../src/server.ts"],
+      "@newfoundcodes/helvetium-dom/router": ["../src/router.ts"]
     }
   },
   "include": ["**/*.tsx"],

@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Fragment, h, createRoot, useId } from '@newfoundcodes/helvetium-dom';
+import { createRoot, useId } from '@newfoundcodes/helvetium-dom';
 
 function Field() {
   const id = useId();

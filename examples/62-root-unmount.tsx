@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, useEffect } from '@newfoundcodes/helvetium-dom';
+import { createRoot, useEffect } from '@newfoundcodes/helvetium-dom';
 
 function App() {
   useEffect(() => () => console.log('cleaned'), []);

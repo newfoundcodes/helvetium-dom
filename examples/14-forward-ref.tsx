@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, createRef, forwardRef, ComponentType } from '@newfoundcodes/helvetium-dom';
+import { createRoot, createRef, forwardRef } from '@newfoundcodes/helvetium-dom';
 
 const SearchBox = forwardRef<{ placeholder: string }, HTMLInputElement>((props, ref) => (
   <input ref={ref} placeholder={props.placeholder} />
@@ -32,12 +32,7 @@ export function mount(container: HTMLElement) {
   const input = createRef<HTMLInputElement>();
   const root = createRoot(container);
 
-  root.render(
-    h(
-      SearchBox as unknown as ComponentType<Record<string, unknown>>,
-      { placeholder: 'Search', ref: input } as unknown as Record<string, unknown>,
-    ),
-  );
+  root.render(<SearchBox placeholder="Search" ref={input} />);
 
   input.current?.focus();
   return root;

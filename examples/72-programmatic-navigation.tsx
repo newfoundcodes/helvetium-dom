@@ -23,11 +23,9 @@
  */
 
 import {
-  Fragment,
   RouterProvider,
   createBrowserRouter,
   createRoot,
-  h,
   useNavigate,
 } from '@newfoundcodes/helvetium-dom';
 
@@ -48,9 +46,14 @@ function Dashboard() {
   return <h1>Dashboard</h1>;
 }
 
-const router = createBrowserRouter([
-  { path: '/sign-in', component: SignIn },
-  { path: '/dashboard', component: Dashboard },
-]);
+export function mount(container: HTMLElement) {
+  const router = createBrowserRouter([
+    { path: '/', component: SignIn },
+    { path: '/sign-in', component: SignIn },
+    { path: '/dashboard', component: Dashboard },
+  ]);
+  const root = createRoot(container);
 
-createRoot(document.getElementById('app')!).render(<RouterProvider router={router} />);
+  root.render(<RouterProvider router={router} />);
+  return root;
+}

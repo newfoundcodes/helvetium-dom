@@ -66,6 +66,7 @@ function serializeAttributes(props: Record<string, unknown>): string {
       key === 'key' ||
       key === 'ref' ||
       key === 'dangerouslySetInnerHTML' ||
+      key === 'rawJson' ||
       isEventProp(key)
     ) {
       continue;
@@ -160,10 +161,13 @@ function renderVNode(
   }
 
   const raw = vnode.props.dangerouslySetInnerHTML as { __html?: unknown } | undefined;
+  const rawJson = vnode.props.rawJson;
   const body =
-    raw && raw.__html != null
-      ? String(raw.__html)
-      : vnode.children.map((child) => renderVNode(child, owner, root, markers)).join('');
+    rawJson !== undefined
+      ? JSON.stringify(rawJson)
+      : raw && raw.__html != null
+        ? String(raw.__html)
+        : vnode.children.map((child) => renderVNode(child, owner, root, markers)).join('');
   return `<${tag}${attrs}>${body}</${tag}>`;
 }
 

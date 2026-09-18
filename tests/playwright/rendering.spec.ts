@@ -24,6 +24,8 @@
 
 import { expect, test, type Page } from '@playwright/test';
 
+type HelvetiumDOM = typeof import('../../src/index.ts');
+
 async function fresh(page: Page): Promise<void> {
   await page.goto('/tests/playwright/fixture.html');
 }
@@ -32,8 +34,8 @@ test.describe('rendering and DOM props', () => {
   test('renders a primitive text child', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      H.createRoot(document.querySelector('#app')).render(H.h('p', null, 'hello'));
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      H.createRoot(document.querySelector('#app')!).render(H.h('p', null, 'hello'));
     });
     await expect(page.locator('#app p')).toHaveText('hello');
   });
@@ -41,14 +43,14 @@ test.describe('rendering and DOM props', () => {
   test('patches text without replacing the element', async ({ page }) => {
     await fresh(page);
     const same = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const app = document.querySelector('#app');
-      const root = H.createRoot(app);
+      const root = H.createRoot(app!);
       root.render(H.h('p', null, 'one'));
 
-      const first = app.firstElementChild;
+      const first = app?.firstElementChild;
       root.render(H.h('p', null, 'two'));
-      return first === app.firstElementChild;
+      return first === app?.firstElementChild;
     });
 
     expect(same).toBe(true);
@@ -62,8 +64,8 @@ test.describe('rendering and DOM props', () => {
     });
 
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      H.createRoot(document.querySelector('#app')).render(H.h('strong', null, 'fresh'));
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      H.createRoot(document.querySelector('#app')!).render(H.h('strong', null, 'fresh'));
     });
 
     await expect(page.locator('#app span')).toHaveCount(0);
@@ -73,8 +75,8 @@ test.describe('rendering and DOM props', () => {
   test('maps className to class', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      H.createRoot(document.querySelector('#app')).render(H.h('div', { className: 'card' }, 'x'));
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      H.createRoot(document.querySelector('#app')!).render(H.h('div', { className: 'card' }, 'x'));
     });
     await expect(page.locator('#app div')).toHaveClass('card');
   });
@@ -82,9 +84,9 @@ test.describe('rendering and DOM props', () => {
   test('removes attributes absent from the next render', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = document.querySelector('#app');
-      const r = H.createRoot(a);
+      const r = H.createRoot(a!);
 
       r.render(H.h('div', { title: 'old', 'data-x': '1' }, 'x'));
       r.render(H.h('div', null, 'x'));
@@ -97,9 +99,9 @@ test.describe('rendering and DOM props', () => {
   test('patches boolean properties', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = document.querySelector('#app');
-      const r = H.createRoot(a);
+      const r = H.createRoot(a!);
 
       r.render(H.h('button', { disabled: true }, 'x'));
     });
@@ -110,9 +112,9 @@ test.describe('rendering and DOM props', () => {
   test('patches live input value through the DOM property', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = document.querySelector('#app');
-      const r = H.createRoot(a);
+      const r = H.createRoot(a!);
 
       r.render(H.h('input', { value: 'alpha' }));
       r.render(H.h('input', { value: 'beta' }));
@@ -123,8 +125,8 @@ test.describe('rendering and DOM props', () => {
   test('serializes data and aria attributes in the client DOM', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      H.createRoot(document.querySelector('#app')).render(
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      H.createRoot(document.querySelector('#app')!).render(
         H.h('button', { 'data-action': 'save', 'aria-pressed': false }, 'Save'),
       );
     });
@@ -136,8 +138,8 @@ test.describe('rendering and DOM props', () => {
   test('adds px to dimensional numeric style values', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      H.createRoot(document.querySelector('#app')).render(
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      H.createRoot(document.querySelector('#app')!).render(
         H.h('div', { style: { width: 12 } }, 'x'),
       );
     });
@@ -150,8 +152,8 @@ test.describe('rendering and DOM props', () => {
   test('keeps unitless style values unitless', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      H.createRoot(document.querySelector('#app')).render(
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      H.createRoot(document.querySelector('#app')!).render(
         H.h('div', { style: { opacity: 0.5 } }, 'x'),
       );
     });
@@ -162,8 +164,8 @@ test.describe('rendering and DOM props', () => {
   test('supports CSS custom properties', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      H.createRoot(document.querySelector('#app')).render(
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      H.createRoot(document.querySelector('#app')!).render(
         H.h('div', { style: { '--gap': 8 } }, 'x'),
       );
     });
@@ -178,8 +180,8 @@ test.describe('rendering and DOM props', () => {
   test('supports string cssText styles', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      H.createRoot(document.querySelector('#app')).render(
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      H.createRoot(document.querySelector('#app')!).render(
         H.h('div', { style: 'display:block; margin-left: 3px' }, 'x'),
       );
     });
@@ -191,9 +193,9 @@ test.describe('rendering and DOM props', () => {
   test('removes stale object style keys', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = document.querySelector('#app');
-      const r = H.createRoot(a);
+      const r = H.createRoot(a!);
 
       r.render(H.h('div', { style: { width: 20, height: 30 } }, 'x'));
       r.render(H.h('div', { style: { width: 25 } }, 'x'));
@@ -207,8 +209,8 @@ test.describe('rendering and DOM props', () => {
   test('renders trusted dangerouslySetInnerHTML', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      H.createRoot(document.querySelector('#app')).render(
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      H.createRoot(document.querySelector('#app')!).render(
         H.h('div', { dangerouslySetInnerHTML: { __html: '<em>trusted</em>' } }),
       );
     });
@@ -219,9 +221,9 @@ test.describe('rendering and DOM props', () => {
   test('switches from raw HTML back to VDOM children', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = document.querySelector('#app');
-      const r = H.createRoot(a);
+      const r = H.createRoot(a!);
 
       r.render(H.h('div', { dangerouslySetInnerHTML: { __html: '<em>raw</em>' } }));
       r.render(H.h('div', null, H.h('span', null, 'vdom')));
@@ -235,7 +237,7 @@ test.describe('rendering and DOM props', () => {
     await fresh(page);
 
     const result = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const c = H.normalizeChildren(['a', [1, null, false, ['b']]]);
       return { length: c.length, text: c.map((v) => v.props.nodeValue ?? '').join('|') };
     });

@@ -54,15 +54,19 @@ function NotFound({ location }: RouteComponentProps) {
   );
 }
 
-const router = createBrowserRouter(
-  [
-    { path: '/', component: AppHome },
-    { path: '/reports', component: Reports },
-  ],
-  {
-    basePath: '/app',
-    notFound: NotFound,
-  },
-);
+export function mount(container: HTMLElement) {
+  const router = createBrowserRouter(
+    [
+      { path: '/', component: AppHome },
+      { path: '/reports', component: Reports },
+    ],
+    {
+      basePath: '/app',
+      notFound: NotFound,
+    },
+  );
+  const root = createRoot(container);
 
-createRoot(document.getElementById('app')!).render(<RouterProvider router={router} />);
+  root.render(<RouterProvider router={router} />);
+  return root;
+}

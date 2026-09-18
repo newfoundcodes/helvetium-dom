@@ -50,15 +50,17 @@
     "test": "npm run test:node && npm run test:playwright",
     "test:watch": "playwright test --ui",
     "coverage": "npm run build && node --experimental-test-coverage --test tests/*.test.mjs",
+    "start": "tsx examples/runner.tsx",
     "prepublishOnly": "npm run typecheck && npm run examples:typecheck && npm run test:node"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.62.1",
-    "@types/node": "^26.4.1",
     "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/node": "^26.4.1",
     "eslint": "^10.10.0",
     "prettier": "^3.9.6",
+    "tsx": "^4.23.13",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.69.0"
   },

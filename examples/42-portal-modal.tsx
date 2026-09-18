@@ -22,9 +22,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createPortal, createRoot } from '@newfoundcodes/helvetium-dom';
+import { createPortal, createRoot } from '@newfoundcodes/helvetium-dom';
 
-export function mount(container: HTMLElement, overlay: HTMLElement) {
+export function mount(container: HTMLElement, overlay: HTMLElement = document.body) {
   const root = createRoot(container);
   root.render(
     <main>

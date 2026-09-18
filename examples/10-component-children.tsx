@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, type VNodeChild } from '@newfoundcodes/helvetium-dom';
+import { createRoot, type VNodeChild } from '@newfoundcodes/helvetium-dom';
 
 function Panel({ title, children }: { title: string; children?: VNodeChild }) {
   return (

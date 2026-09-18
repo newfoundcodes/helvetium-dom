@@ -27,7 +27,17 @@ import { h, createRoot } from '@newfoundcodes/helvetium-dom';
 export function mount(container: HTMLElement) {
   const root = createRoot(container);
   root.render(
-    <section className="card" style={{ padding: 16, opacity: 0.9, '--card-gap': '8px' }}>
+    <section
+      className="card"
+      style={{
+        padding: 16,
+        opacity: 0.9,
+        '--card-gap': '8px',
+        borderColor: 'red',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+      }}
+    >
       Styled card
     </section>,
   );

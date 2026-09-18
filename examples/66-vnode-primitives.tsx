@@ -26,7 +26,6 @@ import {
   createRoot,
   createTextVNode,
   createVNode,
-  h,
   isVNode,
   normalizeChildren,
 } from '@newfoundcodes/helvetium-dom';

@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, useState, useId } from '@newfoundcodes/helvetium-dom';
+import { createRoot, useState, useId } from '@newfoundcodes/helvetium-dom';
 
 function Accordion() {
   const [open, setOpen] = useState(false);

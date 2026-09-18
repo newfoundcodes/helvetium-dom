@@ -128,8 +128,10 @@ export function memo<P>(
 
 export function forwardRef<P, T>(
   render: (props: P, ref: Ref<T>) => VNodeChild,
-): FunctionComponent<P> {
-  const wrapped = ((props: P, ref?: Ref<T>) => render(props, ref)) as FunctionComponent<P>;
+): FunctionComponent<P & { ref?: Ref<T> }> {
+  const wrapped = ((props: P, ref?: Ref<T>) => render(props, ref as Ref<T>)) as FunctionComponent<
+    P & { ref?: Ref<T> }
+  >;
   wrapped.displayName = `ForwardRef(${render.name || 'Component'})`;
   wrapped.__helvetiumForwardRef = true;
   return wrapped;

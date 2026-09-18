@@ -23,6 +23,9 @@
  */
 
 import { expect, test, type Page } from '@playwright/test';
+import { StateSetter } from '../../type/hooks';
+
+type HelvetiumDOM = typeof import('../../src/index.ts');
 
 async function fresh(page: Page): Promise<void> {
   await page.goto('/tests/playwright/fixture.html');
@@ -34,10 +37,10 @@ test.describe('scheduler, errors, and root boundaries', () => {
 
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         let renders = 0,
-          a,
-          b;
+          a: StateSetter<number>,
+          b: StateSetter<number>;
 
         const C = () => {
           renders++;
@@ -50,7 +53,7 @@ test.describe('scheduler, errors, and root boundaries', () => {
           return H.h('p', null, x + y);
         };
 
-        const r = H.createRoot(document.querySelector('#app'));
+        const r = H.createRoot(document.querySelector('#app')!);
         r.render(H.h(C));
 
         H.batch(() => {
@@ -69,8 +72,8 @@ test.describe('scheduler, errors, and root boundaries', () => {
 
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        let set;
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        let set!: (value: number) => void;
 
         const C = () => {
           const [n, s] = H.useState(0);
@@ -78,9 +81,9 @@ test.describe('scheduler, errors, and root boundaries', () => {
           return H.h('p', null, n);
         };
 
-        H.createRoot(document.querySelector('#app')).render(H.h(C));
+        H.createRoot(document.querySelector('#app')!).render(H.h(C));
         H.flushSync(() => set(4));
-        return document.querySelector('p').textContent;
+        return document.querySelector('p')!.textContent;
       }),
     ).toBe('4');
   });
@@ -89,8 +92,8 @@ test.describe('scheduler, errors, and root boundaries', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        let set;
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        let set!: (value: number) => void;
 
         const C = () => {
           const [n, s] = H.useState(0);
@@ -98,12 +101,12 @@ test.describe('scheduler, errors, and root boundaries', () => {
           return H.h('p', null, n);
         };
 
-        const r = H.createRoot(document.querySelector('#app'));
+        const r = H.createRoot(document.querySelector('#app')!);
         r.render(H.h(C));
         set(6);
 
         r.flush();
-        return document.querySelector('p').textContent;
+        return document.querySelector('p')!.textContent;
       }),
     ).toBe('6');
   });
@@ -113,14 +116,15 @@ test.describe('scheduler, errors, and root boundaries', () => {
 
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const calls = [];
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const calls: Array<string> = [];
+
         const C = () => {
           H.useEffect(() => () => calls.push('clean'), []);
           return H.h('p', null, 'x');
         };
 
-        const r = H.createRoot(document.querySelector('#app'));
+        const r = H.createRoot(document.querySelector('#app')!);
         r.render(H.h(C));
         await Promise.resolve();
 
@@ -134,14 +138,14 @@ test.describe('scheduler, errors, and root boundaries', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const calls = [];
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const calls: Array<string> = [];
         const C = () => {
           H.useLayoutEffect(() => () => calls.push('clean'), []);
           return H.h('p', null, 'x');
         };
 
-        const r = H.createRoot(document.querySelector('#app'));
+        const r = H.createRoot(document.querySelector('#app')!);
         r.render(H.h(C));
         r.unmount();
         return calls;
@@ -152,8 +156,9 @@ test.describe('scheduler, errors, and root boundaries', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const errors = [];
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const errors: Array<string> = [];
+
         const C = () => {
           H.useLayoutEffect(() => {
             throw new Error('layout-boom');
@@ -161,8 +166,8 @@ test.describe('scheduler, errors, and root boundaries', () => {
           return H.h('p', null, 'x');
         };
 
-        H.createRoot(document.querySelector('#app'), {
-          onError: (e) => errors.push(String(e.message || e)),
+        H.createRoot(document.querySelector('#app')!, {
+          onError: (e: unknown) => errors.push(String(e instanceof Error ? e.message : e)),
         }).render(H.h(C));
         return errors;
       }),
@@ -173,14 +178,14 @@ test.describe('scheduler, errors, and root boundaries', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const errors = [];
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const errors: Array<string> = [];
         const C = () => {
           throw new Error('render-boom');
         };
 
-        H.createRoot(document.querySelector('#app'), {
-          onError: (e) => errors.push(String(e.message || e)),
+        H.createRoot(document.querySelector('#app')!, {
+          onError: (e: unknown) => errors.push(String(e instanceof Error ? e.message : e)),
         }).render(H.h(C));
         return errors;
       }),
@@ -191,13 +196,13 @@ test.describe('scheduler, errors, and root boundaries', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
 
         try {
           H.useState(0);
           return false;
         } catch (e) {
-          return String(e.message).includes('Hooks can only be called');
+          return String(e).includes('Hooks can only be called');
         }
       }),
     ).toBe(true);
@@ -207,9 +212,9 @@ test.describe('scheduler, errors, and root boundaries', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const errors = [];
-        let set;
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const errors: Array<string> = [];
+        let set!: (value: boolean) => void;
 
         const C = () => {
           const [flag, s] = H.useState(false);
@@ -224,8 +229,8 @@ test.describe('scheduler, errors, and root boundaries', () => {
           return H.h('p', null, 'x');
         };
 
-        const r = H.createRoot(document.querySelector('#app'), {
-          onError: (e) => errors.push(String(e.message || e)),
+        const r = H.createRoot(document.querySelector('#app')!, {
+          onError: (e: unknown) => errors.push(String(e instanceof Error ? e.message : e)),
         });
 
         r.render(H.h(C));
@@ -241,9 +246,9 @@ test.describe('scheduler, errors, and root boundaries', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const errors = [];
-        let set;
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const errors: Array<string> = [];
+        let set!: (value: boolean) => void;
 
         const C = () => {
           const [flag, s] = H.useState(false);
@@ -256,8 +261,8 @@ test.describe('scheduler, errors, and root boundaries', () => {
           return H.h('p', null, 'x');
         };
 
-        const r = H.createRoot(document.querySelector('#app'), {
-          onError: (e) => errors.push(String(e.message || e)),
+        const r = H.createRoot(document.querySelector('#app')!, {
+          onError: (e: unknown) => errors.push(String(e instanceof Error ? e.message : e)),
         });
 
         r.render(H.h(C));
@@ -273,8 +278,8 @@ test.describe('scheduler, errors, and root boundaries', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const errors = [];
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const errors: Array<string> = [];
         const C = () => {
           const [n, setN] = H.useState(0);
           if (n === 0) {
@@ -284,8 +289,8 @@ test.describe('scheduler, errors, and root boundaries', () => {
           return H.h('p', null, n);
         };
 
-        H.createRoot(document.querySelector('#app'), {
-          onError: (e) => errors.push(String(e.message || e)),
+        H.createRoot(document.querySelector('#app')!, {
+          onError: (e: unknown) => errors.push(String(e instanceof Error ? e.message : e)),
         }).render(H.h(C));
         return errors.some((x) => x.includes('during component rendering'));
       }),
@@ -296,10 +301,10 @@ test.describe('scheduler, errors, and root boundaries', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
 
         try {
-          H.createRoot(null);
+          H.createRoot(null as unknown as Element);
           return false;
         } catch (e) {
           return e instanceof TypeError;
@@ -312,10 +317,10 @@ test.describe('scheduler, errors, and root boundaries', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
 
         try {
-          H.hydrateRoot(null, H.h('p', null, 'x'));
+          H.hydrateRoot(null as unknown as Element, H.h('p', null, 'x'));
           return false;
         } catch (e) {
           return e instanceof TypeError;

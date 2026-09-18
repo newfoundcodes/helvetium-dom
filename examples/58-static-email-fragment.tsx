@@ -22,7 +22,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h } from '@newfoundcodes/helvetium-dom';
 import { renderToStaticMarkup } from '@newfoundcodes/helvetium-dom/server';
 
 export function renderReceipt(total: number) {

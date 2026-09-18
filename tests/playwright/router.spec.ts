@@ -23,6 +23,9 @@
  */
 
 import { expect, test, type Page } from '@playwright/test';
+import type { RouteComponentProps } from '../../src/index.ts';
+
+type HelvetiumDOM = typeof import('../../src/index.ts');
 
 async function fresh(page: Page): Promise<void> {
   await page.goto('/tests/playwright/fixture.html');
@@ -32,7 +35,7 @@ test.describe('client router and Anchor', () => {
   test('Anchor renders a real href for progressive enhancement', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const Home = () => H.h(H.Anchor, { to: '/about' }, 'About');
       const router = H.createBrowserRouter([
         { path: '/tests/playwright/fixture.html', component: Home },
@@ -49,7 +52,7 @@ test.describe('client router and Anchor', () => {
     await fresh(page);
 
     const preserved = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       (
         window as unknown as { __helvetiumDocumentToken?: { stable?: boolean } }
       ).__helvetiumDocumentToken = { stable: true };
@@ -81,7 +84,7 @@ test.describe('client router and Anchor', () => {
   test('RouterOutlet swaps page components after an Anchor click', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const Home = () =>
         H.h(
           'main',
@@ -105,7 +108,7 @@ test.describe('client router and Anchor', () => {
   test('navigation keeps query parameters and hashes', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const Home = () =>
         H.h(H.Anchor, { to: '/search?q=helvetium#results', preventScrollReset: true }, 'Search');
       const Search = () => H.h('p', { id: 'search' }, 'Search');
@@ -127,11 +130,12 @@ test.describe('client router and Anchor', () => {
   test('dynamic parameters are passed to route components', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+
       const Home = () =>
         H.h(H.Anchor, { to: '/users/Ada%20Lovelace', preventScrollReset: true }, 'User');
-      const User = ({ params }: { params: { name: string } }) =>
-        H.h('p', { id: 'user' }, params.name);
+      const User = ({ params }: RouteComponentProps) => H.h('p', { id: 'user' }, params.name);
+
       const router = H.createBrowserRouter([
         { path: '/tests/playwright/fixture.html', component: Home },
         { path: '/users/:name', component: User },
@@ -147,10 +151,10 @@ test.describe('client router and Anchor', () => {
   test('optional route parameters match missing values', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       history.replaceState(null, '', '/reports');
 
-      const Report = ({ params }: { params: { year?: string } }) =>
+      const Report = ({ params }: RouteComponentProps) =>
         H.h('p', { id: 'report' }, params.year ?? 'all');
 
       const router = H.createBrowserRouter([{ path: '/reports/:year?', component: Report }]);
@@ -163,11 +167,10 @@ test.describe('client router and Anchor', () => {
   test('splat routes expose the remaining pathname', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       history.replaceState(null, '', '/files/a/b/c.txt');
 
-      const File = ({ params }: { params: { path: string } }) =>
-        H.h('p', { id: 'file' }, params.path);
+      const File = ({ params }: RouteComponentProps) => H.h('p', { id: 'file' }, params.path);
 
       const router = H.createBrowserRouter([{ path: '/files/*path', component: File }]);
       H.createRoot(document.querySelector('#app')!).render(H.h(H.RouterProvider, { router }));
@@ -179,7 +182,7 @@ test.describe('client router and Anchor', () => {
   test('Back restores the previous rendered route through popstate', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const Home = () =>
         H.h(
           'div',
@@ -207,7 +210,7 @@ test.describe('client router and Anchor', () => {
     await fresh(page);
 
     const result = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const before = history.length;
       const Home = () =>
         H.h(H.Anchor, { to: '/replaced', replace: true, preventScrollReset: true }, 'Replace');
@@ -231,7 +234,7 @@ test.describe('client router and Anchor', () => {
   test('history state is available from useLocation', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const Home = () =>
         H.h(
           H.Anchor,
@@ -258,7 +261,7 @@ test.describe('client router and Anchor', () => {
   test('useParams exposes current dynamic params', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       history.replaceState(null, '', '/items/42');
 
       const Item = () => {
@@ -277,7 +280,7 @@ test.describe('client router and Anchor', () => {
     await fresh(page);
 
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const Home = () => {
         const navigate = H.useNavigate();
         return H.h(
@@ -303,7 +306,7 @@ test.describe('client router and Anchor', () => {
   test('a user onClick can cancel Anchor navigation', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const Home = () =>
         H.h(
           H.Anchor,
@@ -328,7 +331,7 @@ test.describe('client router and Anchor', () => {
     await fresh(page);
 
     const result = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const router = H.createBrowserRouter([
         {
           path: '/tests/playwright/fixture.html',
@@ -350,10 +353,10 @@ test.describe('client router and Anchor', () => {
   test('notFound renders for unmatched URLs', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       history.replaceState(null, '', '/does-not-exist');
 
-      const NotFound = ({ location }: { location: { pathname: string } }) =>
+      const NotFound = ({ location }: RouteComponentProps) =>
         H.h('p', { 'data-testid': 'not-found' }, `Missing ${location.pathname}`);
       const router = H.createBrowserRouter(
         [{ path: '/', component: () => H.h('p', null, 'Home') }],
@@ -370,7 +373,7 @@ test.describe('client router and Anchor', () => {
     await fresh(page);
 
     const result = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       history.replaceState(null, '', '/app/home');
 
       const Home = () => H.h(H.Anchor, { to: '/settings' }, 'Settings');
@@ -395,7 +398,7 @@ test.describe('client router and Anchor', () => {
   test('matched route title updates document.title', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       history.replaceState(null, '', '/articles/7');
 
       const router = H.createBrowserRouter([

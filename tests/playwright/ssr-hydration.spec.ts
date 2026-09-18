@@ -23,6 +23,21 @@
  */
 
 import { expect, test, type Page } from '@playwright/test';
+import type { Root } from '../../src/index.ts';
+
+type HelvetiumDOM = typeof import('../../src/index.ts');
+
+declare global {
+  interface Window {
+    __count: number;
+    __calls: string[];
+    __order: string[];
+    __root: Root;
+    __handler: () => void;
+    __value: string;
+    __key: string;
+  }
+}
 
 async function fresh(page: Page): Promise<void> {
   await page.goto('/tests/playwright/fixture.html');
@@ -33,7 +48,7 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         const C = () => H.h('p', null, 'x');
         return H.renderToString(H.h(C));
       }),
@@ -44,7 +59,7 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         return H.renderToString(H.h('p', null, '<script>'));
       }),
     ).toContain('&lt;script&gt;');
@@ -54,7 +69,7 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         return H.renderToString(H.h('p', { title: '"x"' }, 'a'));
       }),
     ).toContain('title="&quot;x&quot;"');
@@ -64,7 +79,7 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
 
     const html = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       return H.renderToString(H.h('button', { disabled: true }, 'x'));
     });
 
@@ -76,7 +91,7 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
 
     const html = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       return H.renderToString(H.h('div', { style: { width: 10, opacity: 0.5 } }, 'x'));
     });
 
@@ -88,7 +103,7 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
 
     const html = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       return H.renderToString(H.h('button', { onClick: () => {} }, 'x'));
     });
 
@@ -99,7 +114,7 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
 
     const html = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const C = () => H.h(H.Fragment, null, H.h('p', null, 'x'));
       return H.renderToStaticMarkup(H.h(C));
     });
@@ -111,13 +126,13 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
 
         try {
-          H.renderToString(H.createPortal(H.h('p', null, 'x'), document.querySelector('#portal')));
+          H.renderToString(H.createPortal(H.h('p', null, 'x'), document.querySelector('#portal')!));
           return false;
         } catch (e) {
-          return String(e.message).includes('Portals cannot be serialized');
+          return String(e).includes('Portals cannot be serialized');
         }
       }),
     ).toBe(true);
@@ -127,7 +142,7 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
 
     const pair = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const C = () => {
         const id = H.useId();
         return H.h('div', { id }, id);
@@ -146,13 +161,13 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         const a = document.querySelector('#app');
-        a.innerHTML = '<section id="x"><span>Hello</span></section>';
+        a!.innerHTML = '<section id="x"><span>Hello</span></section>';
 
-        const old = a.firstElementChild;
-        H.hydrateRoot(a, H.h('section', { id: 'x' }, H.h('span', null, 'Hello')));
-        return old === a.firstElementChild;
+        const old = a!.firstElementChild;
+        H.hydrateRoot(a!, H.h('section', { id: 'x' }, H.h('span', null, 'Hello')));
+        return old === a!.firstElementChild;
       }),
     ).toBe(true);
   });
@@ -161,15 +176,15 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
 
     const result = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = document.querySelector('#app'),
-        errors = [];
+        errors: Array<string> = [];
 
-      a.innerHTML = '<p>old</p>';
-      H.hydrateRoot(a, H.h('p', null, 'new'), {
-        onRecoverableError: (e) => errors.push(String(e.message || e)),
+      a!.innerHTML = '<p>old</p>';
+      H.hydrateRoot(a!, H.h('p', null, 'new'), {
+        onRecoverableError: (e) => errors.push(String(e)),
       });
-      return { text: a.textContent, errors };
+      return { text: a!.textContent, errors };
     });
 
     expect(result.text).toBe('new');
@@ -180,18 +195,18 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
 
     const result = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = document.querySelector('#app'),
         errors = [];
-      a.innerHTML = '<p>x</p>';
+      a!.innerHTML = '<p>x</p>';
 
-      const old = a.firstElementChild;
-      H.hydrateRoot(a, H.h('section', null, 'x'), {
-        onRecoverableError: (e) => errors.push(String(e.message || e)),
+      const old = a!.firstElementChild;
+      H.hydrateRoot(a!, H.h('section', null, 'x'), {
+        onRecoverableError: (e) => errors.push(String(e)),
       });
       return {
-        tag: a.firstElementChild.tagName,
-        same: old === a.firstElementChild,
+        tag: a?.firstElementChild?.tagName,
+        same: old === a?.firstElementChild,
         count: errors.length,
       };
     });
@@ -204,11 +219,11 @@ test.describe('SSR and hydration', () => {
   test('hydration removes extra server siblings', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = document.querySelector('#app');
 
-      a.innerHTML = '<p>x</p><span>extra</span>';
-      H.hydrateRoot(a, H.h('p', null, 'x'));
+      a!.innerHTML = '<p>x</p><span>extra</span>';
+      H.hydrateRoot(a!, H.h('p', null, 'x'));
     });
 
     await expect(page.locator('#app > *')).toHaveCount(1);
@@ -217,11 +232,11 @@ test.describe('SSR and hydration', () => {
   test('hydration reconciles stale attributes', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = document.querySelector('#app');
 
-      a.innerHTML = '<button title="stale" data-old="1">x</button>';
-      H.hydrateRoot(a, H.h('button', { id: 'fresh' }, 'x'));
+      a!.innerHTML = '<button title="stale" data-old="1">x</button>';
+      H.hydrateRoot(a!, H.h('button', { id: 'fresh' }, 'x'));
     });
 
     await expect(page.locator('button')).toHaveAttribute('id', 'fresh');
@@ -231,12 +246,12 @@ test.describe('SSR and hydration', () => {
   test('hydration attaches event handlers to adopted elements', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       window.__count = 0;
 
       const a = document.querySelector('#app');
-      a.innerHTML = '<button>Run</button>';
-      H.hydrateRoot(a, H.h('button', { onClick: () => window.__count++ }, 'Run'));
+      a!.innerHTML = '<button>Run</button>';
+      H.hydrateRoot(a!, H.h('button', { onClick: () => window.__count++ }, 'Run'));
     });
 
     await page.getByRole('button').click();
@@ -247,7 +262,7 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
 
     const html = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const C = () => {
         const [n] = H.useState(0);
         return H.h('p', null, n);
@@ -261,15 +276,15 @@ test.describe('SSR and hydration', () => {
     }, html);
 
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const C = () => {
         const [n, setN] = H.useState(0);
         return H.h('button', { onClick: () => setN(n + 1) }, n);
       };
 
       const a = document.querySelector('#app');
-      a.innerHTML = H.renderToString(H.h(C));
-      H.hydrateRoot(a, H.h(C));
+      a!.innerHTML = H.renderToString(H.h(C));
+      H.hydrateRoot(a!, H.h(C));
     });
 
     await page.getByRole('button').click();
@@ -280,18 +295,18 @@ test.describe('SSR and hydration', () => {
     await fresh(page);
 
     const result = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const C = () => {
         const id = H.useId();
         return H.h('div', { id }, id);
       };
 
       const a = document.querySelector('#app');
-      a.innerHTML = H.renderToString(H.h(C), { identifierPrefix: 'same-' });
+      a!.innerHTML = H.renderToString(H.h(C), { identifierPrefix: 'same-' });
 
-      const before = a.querySelector('div').id;
-      H.hydrateRoot(a, H.h(C), { identifierPrefix: 'same-' });
-      return [before, a.querySelector('div').id, a.textContent];
+      const before = a!.querySelector('div')!.id;
+      H.hydrateRoot(a!, H.h(C), { identifierPrefix: 'same-' });
+      return [before, a!.querySelector('div')!.id, a!.textContent];
     });
 
     expect(result[0]).toBe(result[1]);

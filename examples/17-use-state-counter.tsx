@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, useState } from '@newfoundcodes/helvetium-dom';
+import { createRoot, useState } from '@newfoundcodes/helvetium-dom';
 
 function Counter() {
   const [count, setCount] = useState(0);

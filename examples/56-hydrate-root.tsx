@@ -22,13 +22,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, hydrateRoot } from '@newfoundcodes/helvetium-dom';
+import { hydrateRoot } from '@newfoundcodes/helvetium-dom';
 
 export function hydrate(container: HTMLElement) {
   return hydrateRoot(
     container,
     <main>
       <h1>Hydrated</h1>
+      <p>Lorem ipsum dolorem sit amet.</p>
     </main>,
     { onRecoverableError: console.warn },
   );

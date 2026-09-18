@@ -24,6 +24,8 @@
 
 import { expect, test, type Page } from '@playwright/test';
 
+type HelvetiumDOM = typeof import('../../src/index.ts');
+
 async function fresh(page: Page): Promise<void> {
   await page.goto('/tests/playwright/fixture.html');
 }
@@ -33,10 +35,10 @@ test.describe('refs, portals, and namespaces', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const ref = H.createRef();
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const ref = H.createRef<HTMLButtonElement>();
 
-        H.createRoot(document.querySelector('#app')).render(H.h('button', { ref }, 'x'));
+        H.createRoot(document.querySelector('#app')!).render(H.h('button', { ref }, 'x'));
         return ref.current?.tagName;
       }),
     ).toBe('BUTTON');
@@ -46,9 +48,9 @@ test.describe('refs, portals, and namespaces', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         const ref = H.createRef();
-        const r = H.createRoot(document.querySelector('#app'));
+        const r = H.createRoot(document.querySelector('#app')!);
 
         r.render(H.h('button', { ref }, 'x'));
         r.unmount();
@@ -61,11 +63,11 @@ test.describe('refs, portals, and namespaces', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const seen = [];
-        const r = H.createRoot(document.querySelector('#app'));
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const seen: Array<string | null> = [];
+        const r = H.createRoot(document.querySelector('#app')!);
 
-        r.render(H.h('span', { ref: (v) => seen.push(v?.tagName ?? null) }, 'x'));
+        r.render(H.h('span', { ref: (v: Element | null) => seen.push(v?.tagName ?? null) }, 'x'));
         r.unmount();
         return seen;
       }),
@@ -76,10 +78,10 @@ test.describe('refs, portals, and namespaces', () => {
     await fresh(page);
 
     const result = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = H.createRef(),
         b = H.createRef(),
-        host = document.querySelector('#app'),
+        host = document.querySelector('#app')!,
         r = H.createRoot(host);
       r.render(H.h('div', { ref: a }, 'x'));
 
@@ -94,11 +96,13 @@ test.describe('refs, portals, and namespaces', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const Input = H.forwardRef((props, ref) => H.h('input', { ref, value: props.value }));
-        const ref = H.createRef();
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const Input = H.forwardRef<{ value: string }, HTMLInputElement>((props, ref) =>
+          H.h('input', { ref, value: props.value }),
+        );
+        const ref = H.createRef<HTMLInputElement>();
 
-        H.createRoot(document.querySelector('#app')).render(H.h(Input, { value: 'x', ref }));
+        H.createRoot(document.querySelector('#app')!).render(H.h(Input, { value: 'x', ref }));
         return [ref.current?.tagName, ref.current?.value];
       }),
     ).toEqual(['INPUT', 'x']);
@@ -107,13 +111,13 @@ test.describe('refs, portals, and namespaces', () => {
   test('renders portal content into its target', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      H.createRoot(document.querySelector('#app')).render(
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      H.createRoot(document.querySelector('#app')!).render(
         H.h(
           'main',
           null,
           'base',
-          H.createPortal(H.h('strong', null, 'portal'), document.querySelector('#portal')),
+          H.createPortal(H.h('strong', null, 'portal'), document.querySelector('#portal')!),
         ),
       );
     });
@@ -126,9 +130,9 @@ test.describe('refs, portals, and namespaces', () => {
     await fresh(page);
 
     const same = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      const host = document.querySelector('#app'),
-        target = document.querySelector('#portal'),
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      const host = document.querySelector('#app')!,
+        target = document.querySelector('#portal')!,
         r = H.createRoot(host);
       r.render(H.createPortal(H.h('span', null, 'a'), target));
 
@@ -144,10 +148,10 @@ test.describe('refs, portals, and namespaces', () => {
   test('removes portal content on unmount', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      const r = H.createRoot(document.querySelector('#app'));
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      const r = H.createRoot(document.querySelector('#app')!);
 
-      r.render(H.createPortal(H.h('span', null, 'x'), document.querySelector('#portal')));
+      r.render(H.createPortal(H.h('span', null, 'x'), document.querySelector('#portal')!));
       r.unmount();
     });
     await expect(page.locator('#portal span')).toHaveCount(0);
@@ -156,14 +160,14 @@ test.describe('refs, portals, and namespaces', () => {
   test('moves portal output when the target changes', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      const one = document.querySelector('#portal'),
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      const one = document.querySelector('#portal')!,
         two = document.createElement('aside');
 
       two.id = 'portal2';
       document.body.append(two);
 
-      const r = H.createRoot(document.querySelector('#app'));
+      const r = H.createRoot(document.querySelector('#app')!);
       r.render(H.createPortal(H.h('span', null, 'x'), one));
       r.render(H.createPortal(H.h('span', null, 'x'), two));
     });
@@ -177,12 +181,11 @@ test.describe('refs, portals, and namespaces', () => {
 
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        H.createRoot(document.querySelector('#app')).render(
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        H.createRoot(document.querySelector('#app')!).render(
           H.h('svg', null, H.h('circle', { cx: 1, cy: 1, r: 1 })),
         );
-
-        return document.querySelector('circle').namespaceURI;
+        return document.querySelector('circle')!.namespaceURI;
       }),
     ).toBe('http://www.w3.org/2000/svg');
   });
@@ -191,8 +194,8 @@ test.describe('refs, portals, and namespaces', () => {
     await fresh(page);
 
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      H.createRoot(document.querySelector('#app')).render(
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      H.createRoot(document.querySelector('#app')!).render(
         H.h('svg', null, H.h('circle', { strokeWidth: 3 })),
       );
     });
@@ -204,11 +207,11 @@ test.describe('refs, portals, and namespaces', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        H.createRoot(document.querySelector('#app')).render(
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        H.createRoot(document.querySelector('#app')!).render(
           H.h('svg', null, H.h('foreignObject', null, H.h('div', null, 'x'))),
         );
-        return document.querySelector('foreignObject div').namespaceURI;
+        return document.querySelector('foreignObject div')!.namespaceURI;
       }),
     ).toBe('http://www.w3.org/1999/xhtml');
   });
@@ -217,14 +220,13 @@ test.describe('refs, portals, and namespaces', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        H.createRoot(document.querySelector('#app')).render(
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        H.createRoot(document.querySelector('#app')!).render(
           H.h('math', null, H.h('mi', null, 'x')),
         );
-
         return [
-          document.querySelector('math').namespaceURI,
-          document.querySelector('mi').namespaceURI,
+          document.querySelector('math')!.namespaceURI,
+          document.querySelector('mi')!.namespaceURI,
         ];
       }),
     ).toEqual(['http://www.w3.org/1998/Math/MathML', 'http://www.w3.org/1998/Math/MathML']);
@@ -234,7 +236,7 @@ test.describe('refs, portals, and namespaces', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         const f = document.createDocumentFragment();
 
         H.createRoot(f).render(H.h('p', null, 'detached'));

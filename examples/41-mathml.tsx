@@ -22,12 +22,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot } from '@newfoundcodes/helvetium-dom';
+import { createRoot } from '@newfoundcodes/helvetium-dom';
 
 export function mount(container: HTMLElement) {
   const root = createRoot(container);
   root.render(
-    h('math', null, h('mrow', null, h('mi', null, 'x'), h('mo', null, '='), h('mn', null, 2))),
+    <math>
+      <mrow>
+        <mi>x</mi>
+        <mo>=</mo>
+        <mn>2</mn>
+      </mrow>
+    </math>,
   );
   return root;
 }

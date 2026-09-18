@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, flushSync, useState, type StateSetter } from '@newfoundcodes/helvetium-dom';
+import { createRoot, flushSync, useState, type StateSetter } from '@newfoundcodes/helvetium-dom';
 
 let setOpen: StateSetter<boolean>;
 
@@ -32,7 +32,7 @@ function App() {
   return <div data-open={open}>{open ? 'open' : 'closed'}</div>;
 }
 
-export function mountAndOpen(container: HTMLElement) {
+export function mount(container: HTMLElement) {
   const root = createRoot(container);
   root.render(<App />);
 

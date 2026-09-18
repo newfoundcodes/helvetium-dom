@@ -24,8 +24,36 @@
 
 import { h, createRoot } from '@newfoundcodes/helvetium-dom';
 
-export function mount(container: HTMLElement, signedIn = true) {
+export function mount(container: HTMLElement) {
   const root = createRoot(container);
-  root.render(<nav>{signedIn ? <button>Sign out</button> : <a href="/login">Sign in</a>}</nav>);
+  let signedIn = true;
+
+  function toggle() {
+    signedIn = !signedIn;
+    render();
+  }
+
+  function render() {
+    root.render(
+      <div>
+        <button onClick={toggle}>Toggle State</button>
+        <hr />
+        <nav>
+          {signedIn ? (
+            <button onClick={toggle}>Sign out</button>
+          ) : (
+            <a href="javascript:void(0)" onClick={toggle}>
+              Sign in
+            </a>
+          )}
+        </nav>
+        <p>
+          You are currently <strong>{signedIn ? 'Signed In' : 'Signed Out'}</strong>.
+        </p>
+      </div>,
+    );
+  }
+
+  render();
   return root;
 }

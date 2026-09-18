@@ -6,6 +6,7 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "strict": true,
     "skipLibCheck": true,
+    "types": ["node"],
     "jsx": "react-jsx",
     "jsxImportSource": "@newfoundcodes/helvetium-dom",
     "noEmit": true,

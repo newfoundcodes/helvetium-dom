@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, memo } from '@newfoundcodes/helvetium-dom';
+import { createRoot, memo } from '@newfoundcodes/helvetium-dom';
 
 const Label = memo(function Label({ value }: { value: string }) {
   return <span>{value}</span>;

@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, useEffect, useState } from '@newfoundcodes/helvetium-dom';
+import { createRoot, useEffect, useState } from '@newfoundcodes/helvetium-dom';
 
 function App() {
   const [online, setOnline] = useState(navigator.onLine);

@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, createContext, useContext } from '@newfoundcodes/helvetium-dom';
+import { createRoot, createContext, useContext } from '@newfoundcodes/helvetium-dom';
 
 const Locale = createContext('en');
 

@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot } from '@newfoundcodes/helvetium-dom';
+import { createRoot } from '@newfoundcodes/helvetium-dom';
 
 type NodeModel = { label: string; children?: NodeModel[] };
 
@@ -45,7 +45,7 @@ export function mount(container: HTMLElement) {
   const root = createRoot(container);
   root.render(
     <ul>
-      <Tree node={{ label: 'src', children: [{ label: 'index.ts' }] }} />
+      <Tree node={{ label: 'src', children: [{ label: 'index.ts' }, { label: 'global.css' }] }} />
     </ul>,
   );
   return root;

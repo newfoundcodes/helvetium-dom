@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, useReducer } from '@newfoundcodes/helvetium-dom';
+import { createRoot, useReducer } from '@newfoundcodes/helvetium-dom';
 
 type Action = { type: 'inc' } | { type: 'dec' };
 

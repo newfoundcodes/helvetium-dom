@@ -23,6 +23,16 @@
  */
 
 import { expect, test, type Page } from '@playwright/test';
+import type { RefObject, VNodeChild } from '../../src/index.ts';
+
+type HelvetiumDOM = typeof import('../../src/index.ts');
+type StateSetter<T> = (next: T | ((previous: T) => T)) => void;
+
+declare global {
+  interface Window {
+    __effect?: string;
+  }
+}
 
 async function fresh(page: Page): Promise<void> {
   await page.goto('/tests/playwright/fixture.html');
@@ -32,10 +42,10 @@ test.describe('components and hooks', () => {
   test('renders function component props', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      const G = ({ name }) => H.h('p', null, 'Hello ', name);
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      const G = ({ name }: { name: string }) => H.h('p', null, 'Hello ', name);
 
-      H.createRoot(document.querySelector('#app')).render(H.h(G, { name: 'Ada' }));
+      H.createRoot(document.querySelector('#app')!).render(H.h(G, { name: 'Ada' }));
     });
 
     await expect(page.locator('p')).toHaveText('Hello Ada');
@@ -44,10 +54,10 @@ test.describe('components and hooks', () => {
   test('passes normalized children through component props', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      const P = (props) => H.h('section', null, props.children);
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      const P = (props: { children?: VNodeChild }) => H.h('section', null, props.children);
 
-      H.createRoot(document.querySelector('#app')).render(H.h(P, null, H.h('b', null, 'child')));
+      H.createRoot(document.querySelector('#app')!).render(H.h(P, null, H.h('b', null, 'child')));
     });
 
     await expect(page.locator('section b')).toHaveText('child');
@@ -56,13 +66,13 @@ test.describe('components and hooks', () => {
   test('useState updates component DOM', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const C = () => {
         const [n, setN] = H.useState(0);
         return H.h('button', { onClick: () => setN(n + 1) }, String(n));
       };
 
-      H.createRoot(document.querySelector('#app')).render(H.h(C));
+      H.createRoot(document.querySelector('#app')!).render(H.h(C));
     });
 
     await page.getByRole('button').click();
@@ -72,7 +82,7 @@ test.describe('components and hooks', () => {
   test('useState functional updaters observe latest slot value', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const C = () => {
         const [n, setN] = H.useState(0);
         return H.h(
@@ -89,7 +99,7 @@ test.describe('components and hooks', () => {
         );
       };
 
-      H.createRoot(document.querySelector('#app')).render(H.h(C));
+      H.createRoot(document.querySelector('#app')!).render(H.h(C));
     });
 
     await page.getByRole('button').click();
@@ -100,9 +110,9 @@ test.describe('components and hooks', () => {
     await fresh(page);
 
     const renders = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      let renders = 0,
-        set;
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      let renders = 0;
+      let set: StateSetter<number> | undefined;
       const C = () => {
         renders++;
         const [n, s] = H.useState(1);
@@ -110,9 +120,9 @@ test.describe('components and hooks', () => {
         return H.h('p', null, n);
       };
 
-      const r = H.createRoot(document.querySelector('#app'));
+      const r = H.createRoot(document.querySelector('#app')!);
       r.render(H.h(C));
-      set(1);
+      set!(1);
 
       r.flush();
       return renders;
@@ -126,10 +136,10 @@ test.describe('components and hooks', () => {
 
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const setters = [];
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const setters: StateSetter<number>[] = [];
 
-        let set;
+        let set: StateSetter<number> | undefined;
         const C = () => {
           const [n, s] = H.useState(0);
           set = s;
@@ -138,9 +148,9 @@ test.describe('components and hooks', () => {
           return H.h('p', null, n);
         };
 
-        const r = H.createRoot(document.querySelector('#app'));
+        const r = H.createRoot(document.querySelector('#app')!);
         r.render(H.h(C));
-        set(1);
+        set!(1);
 
         r.flush();
         return setters[0] === setters[1];
@@ -151,13 +161,13 @@ test.describe('components and hooks', () => {
   test('useReducer dispatches state transitions', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const C = () => {
-        const [n, d] = H.useReducer((s, a) => s + a, 0);
+        const [n, d] = H.useReducer((s: number, a: number) => s + a, 0);
         return H.h('button', { onClick: () => d(3) }, n);
       };
 
-      H.createRoot(document.querySelector('#app')).render(H.h(C));
+      H.createRoot(document.querySelector('#app')!).render(H.h(C));
     });
 
     await page.getByRole('button').click();
@@ -167,7 +177,7 @@ test.describe('components and hooks', () => {
   test('useEffect runs after commit', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       window.__effect = 'pending';
 
       const C = () => {
@@ -177,7 +187,7 @@ test.describe('components and hooks', () => {
         return H.h('p', null, 'x');
       };
 
-      H.createRoot(document.querySelector('#app')).render(H.h(C));
+      H.createRoot(document.querySelector('#app')!).render(H.h(C));
     });
 
     await expect.poll(() => page.evaluate(() => window.__effect)).toBe('ran');
@@ -187,10 +197,10 @@ test.describe('components and hooks', () => {
     await fresh(page);
 
     const calls = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      const calls = [];
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      const calls: string[] = [];
 
-      let set;
+      let set: StateSetter<number> | undefined;
       const C = () => {
         const [n, s] = H.useState(0);
         set = s;
@@ -202,10 +212,10 @@ test.describe('components and hooks', () => {
         return H.h('p', null, n);
       };
 
-      const r = H.createRoot(document.querySelector('#app'));
+      const r = H.createRoot(document.querySelector('#app')!);
       r.render(H.h(C));
       await Promise.resolve();
-      set(1);
+      set!(1);
 
       r.flush();
       await Promise.resolve();
@@ -219,17 +229,17 @@ test.describe('components and hooks', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         let state = 'before';
 
         const C = () => {
           H.useLayoutEffect(() => {
-            state = document.querySelector('#app').textContent;
+            state = document.querySelector('#app')!.textContent ?? '';
           }, []);
           return H.h('p', null, 'committed');
         };
 
-        H.createRoot(document.querySelector('#app')).render(H.h(C));
+        H.createRoot(document.querySelector('#app')!).render(H.h(C));
         return state;
       }),
     ).toBe('committed');
@@ -239,9 +249,9 @@ test.describe('components and hooks', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        let computes = 0,
-          set;
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        let computes = 0;
+        let set: StateSetter<number> | undefined;
         const C = () => {
           const [n, s] = H.useState(0);
           set = s;
@@ -253,9 +263,9 @@ test.describe('components and hooks', () => {
           return H.h('p', null, v, n);
         };
 
-        const r = H.createRoot(document.querySelector('#app'));
+        const r = H.createRoot(document.querySelector('#app')!);
         r.render(H.h(C));
-        set(1);
+        set!(1);
 
         r.flush();
         return computes;
@@ -267,9 +277,9 @@ test.describe('components and hooks', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const values = [];
-        let set;
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const values: (() => number)[] = [];
+        let set: StateSetter<number> | undefined;
 
         const C = () => {
           const [n, s] = H.useState(0);
@@ -279,9 +289,9 @@ test.describe('components and hooks', () => {
           return H.h('p', null, n);
         };
 
-        const r = H.createRoot(document.querySelector('#app'));
+        const r = H.createRoot(document.querySelector('#app')!);
         r.render(H.h(C));
-        set(1);
+        set!(1);
 
         r.flush();
         return values[0] === values[1];
@@ -293,10 +303,10 @@ test.describe('components and hooks', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const refs = [];
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const refs: RefObject<string>[] = [];
 
-        let set;
+        let set: StateSetter<number> | undefined;
         const C = () => {
           const [n, s] = H.useState(0);
           set = s;
@@ -305,9 +315,9 @@ test.describe('components and hooks', () => {
           return H.h('p', null, n);
         };
 
-        const r = H.createRoot(document.querySelector('#app'));
+        const r = H.createRoot(document.querySelector('#app')!);
         r.render(H.h(C));
-        set(1);
+        set!(1);
 
         r.flush();
         return refs[0] === refs[1];
@@ -318,11 +328,11 @@ test.describe('components and hooks', () => {
   test('useContext returns the default value without a provider', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const Ctx = H.createContext('default');
       const C = () => H.h('p', null, H.useContext(Ctx));
 
-      H.createRoot(document.querySelector('#app')).render(H.h(C));
+      H.createRoot(document.querySelector('#app')!).render(H.h(C));
     });
     await expect(page.locator('p')).toHaveText('default');
   });
@@ -330,11 +340,11 @@ test.describe('components and hooks', () => {
   test('context provider supplies its subtree value', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const Ctx = H.createContext('default');
       const C = () => H.h('p', null, H.useContext(Ctx));
 
-      H.createRoot(document.querySelector('#app')).render(
+      H.createRoot(document.querySelector('#app')!).render(
         H.h(Ctx.Provider, { value: 'provided' }, H.h(C)),
       );
     });
@@ -344,11 +354,11 @@ test.describe('components and hooks', () => {
   test('nested providers select the nearest value', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const Ctx = H.createContext('d');
       const C = () => H.h('p', null, H.useContext(Ctx));
 
-      H.createRoot(document.querySelector('#app')).render(
+      H.createRoot(document.querySelector('#app')!).render(
         H.h(
           Ctx.Provider,
           { value: 'outer' },
@@ -363,10 +373,10 @@ test.describe('components and hooks', () => {
   test('provider updates propagate to consumers', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const Ctx = H.createContext('d');
       const C = () => H.h('p', null, H.useContext(Ctx));
-      const host = document.querySelector('#app'),
+      const host = document.querySelector('#app')!,
         r = H.createRoot(host);
 
       r.render(H.h(Ctx.Provider, { value: 'a' }, H.h(C)));
@@ -378,14 +388,14 @@ test.describe('components and hooks', () => {
   test('useId includes the root identifier prefix', async ({ page }) => {
     await fresh(page);
     const id = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const C = () => {
         const id = H.useId();
         return H.h('div', { id }, id);
       };
 
-      H.createRoot(document.querySelector('#app'), { identifierPrefix: 'test-' }).render(H.h(C));
-      return document.querySelector('#app div').id;
+      H.createRoot(document.querySelector('#app')!, { identifierPrefix: 'test-' }).render(H.h(C));
+      return document.querySelector('#app div')!.id;
     });
 
     expect(id.startsWith('test-v-')).toBe(true);
@@ -395,15 +405,15 @@ test.describe('components and hooks', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         let renders = 0;
 
-        const C = H.memo(({ value }) => {
+        const C = H.memo<{ value: string }>(({ value }) => {
           renders++;
           return H.h('p', null, value);
         });
 
-        const r = H.createRoot(document.querySelector('#app'));
+        const r = H.createRoot(document.querySelector('#app')!);
         r.render(H.h(C, { value: 'x' }));
         r.render(H.h(C, { value: 'x' }));
         return renders;
@@ -415,17 +425,18 @@ test.describe('components and hooks', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         let renders = 0;
 
         const C = H.memo(
-          ({ point }) => {
+          ({ point }: { point: { x: number; y: number } }) => {
             renders++;
             return H.h('p', null, point.x);
           },
-          (a, b) => a.point.x === b.point.x,
+          (a: { point: { x: number; y: number } }, b: { point: { x: number; y: number } }) =>
+            a.point.x === b.point.x,
         );
-        const r = H.createRoot(document.querySelector('#app'));
+        const r = H.createRoot(document.querySelector('#app')!);
 
         r.render(H.h(C, { point: { x: 1, y: 1 } }));
         r.render(H.h(C, { point: { x: 1, y: 2 } }));

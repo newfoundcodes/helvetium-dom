@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Fragment, h, createRoot } from '@newfoundcodes/helvetium-dom';
+import { createRoot } from '@newfoundcodes/helvetium-dom';
 
 const Header = () => (
   <header>

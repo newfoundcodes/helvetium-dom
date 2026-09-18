@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Fragment, h, createRoot, memo, useCallback, useState } from '@newfoundcodes/helvetium-dom';
+import { createRoot, memo, useCallback, useState } from '@newfoundcodes/helvetium-dom';
 
 const Action = memo(({ onRun }: { onRun: () => void }) => <button onClick={onRun}>Run</button>);
 

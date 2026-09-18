@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, useMemo } from '@newfoundcodes/helvetium-dom';
+import { createRoot, useMemo } from '@newfoundcodes/helvetium-dom';
 
 function App({ values }: { values: number[] }) {
   const total = useMemo(() => values.reduce((sum, value) => sum + value, 0), [values]);

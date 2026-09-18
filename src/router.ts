@@ -22,10 +22,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { forwardRef } from './component.js';
 import { createContext } from './context.js';
-import { useCallback, useContext, useLayoutEffect, useState } from './hooks.js';
+import { useCallback, useContext, useLayoutEffect, useMemo, useState } from './hooks.js';
 import { h } from './vnode.js';
-import type { ComponentType, VNodeChild } from '../type/core.js';
+import type { ComponentType, Ref, VNodeChild } from '../type/core.js';
 import type {
   AnchorProps,
   BrowserRouter,
@@ -550,12 +551,15 @@ export function RouterProvider(props: RouterProviderProps): VNodeChild {
   );
   void version;
 
-  const value: RouterContextValue = {
-    router: props.router,
-    location: props.router.location,
-    match: props.router.match,
-    fallback: props.fallback,
-  };
+  const value: RouterContextValue = useMemo(
+    () => ({
+      router: props.router,
+      location: props.router.location,
+      match: props.router.match,
+      fallback: props.fallback,
+    }),
+    [props.router, props.router.location, props.router.match, props.fallback],
+  );
   return h(RouterContext.Provider, { value }, props.children ?? h(RouterOutlet, null));
 }
 
@@ -594,7 +598,10 @@ export function RouterOutlet(props: RouterOutletProps = {}): VNodeChild {
   return props.fallback ?? context.fallback ?? null;
 }
 
-export function Anchor(props: AnchorProps): VNodeChild {
+export const Anchor = forwardRef<AnchorProps, HTMLAnchorElement>(function Anchor(
+  props: AnchorProps,
+  ref: Ref<HTMLAnchorElement>,
+): VNodeChild {
   const router = useRouter();
   const {
     to,
@@ -633,6 +640,7 @@ export function Anchor(props: AnchorProps): VNodeChild {
     'a',
     {
       ...anchorProps,
+      ref,
       href,
       target,
       download,
@@ -644,7 +652,7 @@ export function Anchor(props: AnchorProps): VNodeChild {
     },
     children ?? null,
   );
-}
+});
 
 export function useRouter(): Router {
   return contextValue().router;

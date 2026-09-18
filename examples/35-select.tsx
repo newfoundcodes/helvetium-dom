@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Fragment, h, createRoot, useState } from '@newfoundcodes/helvetium-dom';
+import { createRoot, useState } from '@newfoundcodes/helvetium-dom';
 
 function App() {
   const [role, setRole] = useState('developer');

@@ -24,12 +24,10 @@
 
 import {
   Anchor,
-  Fragment,
   RouterOutlet,
   RouterProvider,
   createBrowserRouter,
   createRoot,
-  h,
 } from '@newfoundcodes/helvetium-dom';
 
 function Dashboard() {
@@ -51,13 +49,17 @@ function Shell() {
   );
 }
 
-const router = createBrowserRouter([
-  { path: '/dashboard', component: Dashboard },
-  { path: '/settings', component: Settings },
-]);
+export function mount(container: HTMLElement) {
+  const router = createBrowserRouter([
+    { path: '/dashboard', component: Dashboard },
+    { path: '/settings', component: Settings },
+  ]);
+  const root = createRoot(container);
 
-createRoot(document.getElementById('app')!).render(
-  <RouterProvider router={router}>
-    <Shell />
-  </RouterProvider>,
-);
+  root.render(
+    <RouterProvider router={router}>
+      <Shell />
+    </RouterProvider>,
+  );
+  return root;
+}

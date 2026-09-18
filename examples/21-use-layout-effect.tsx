@@ -22,19 +22,40 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, useLayoutEffect, useRef, useState } from '@newfoundcodes/helvetium-dom';
+import { createRoot, useLayoutEffect, useRef, useState } from '@newfoundcodes/helvetium-dom';
 
-function App() {
-  const ref = useRef<HTMLDivElement | null>(null);
+function useMeasure(ref: { current: HTMLElement | null }) {
   const [width, setWidth] = useState(0);
 
   useLayoutEffect(() => {
-    setWidth(ref.current?.getBoundingClientRect().width ?? 0);
-  }, []);
+    if (!ref.current) {
+      return;
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setWidth(entry.contentRect.width);
+      }
+    });
+
+    observer.observe(ref.current);
+    return () => {
+      observer.disconnect();
+    };
+  }, [ref]);
+  return width;
+}
+
+function App() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const width = useMeasure(ref);
   return (
     <div>
-      <div ref={ref}>Measure me</div>
-      <output>{width}</output>
+      <div ref={ref} style={{ border: '1px solid black', padding: '10px' }}>
+        Resize the window to measure me
+      </div>
+      <br />
+      <output>Width: {width}px</output>
     </div>
   );
 }

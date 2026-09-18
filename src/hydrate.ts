@@ -144,6 +144,7 @@ function reconcileHydratedAttributes(element: Element, props: Record<string, unk
       propName === 'key' ||
       propName === 'ref' ||
       propName === 'dangerouslySetInnerHTML' ||
+      propName === 'rawJson' ||
       isEventProp(propName)
     ) {
       continue;
@@ -298,7 +299,15 @@ function hydrateVNode(
   patchProps(element, {}, vnode.props);
 
   const raw = vnode.props.dangerouslySetInnerHTML as { __html?: unknown } | undefined;
-  if (raw && raw.__html != null) {
+  const rawJson = vnode.props.rawJson;
+
+  if (rawJson !== undefined) {
+    const expected = JSON.stringify(rawJson);
+    if (element.textContent !== expected) {
+      recoverable(root, `Hydration HTML mismatch in <${vnode.kind}>.`);
+      element.textContent = expected;
+    }
+  } else if (raw && raw.__html != null) {
     const expected = String(raw.__html);
     if (element.innerHTML !== expected) {
       recoverable(root, `Hydration HTML mismatch in <${vnode.kind}>.`);

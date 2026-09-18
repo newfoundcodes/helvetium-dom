@@ -22,7 +22,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h } from '@newfoundcodes/helvetium-dom';
 import { renderToString } from '@newfoundcodes/helvetium-dom/server';
 
 export const html = renderToString(<p title={'"quoted"'}>{'<script>alert(1)</script>'}</p>);

@@ -22,9 +22,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot } from '@newfoundcodes/helvetium-dom';
+import { createRoot } from '@newfoundcodes/helvetium-dom';
 
-export function mountTrusted(container: HTMLElement, trustedHtml: string) {
+export function mount(container: HTMLElement, trustedHtml: string = '<strong>Danger!</strong>') {
   const root = createRoot(container);
   root.render(<div dangerouslySetInnerHTML={{ __html: trustedHtml }} />);
   return root;

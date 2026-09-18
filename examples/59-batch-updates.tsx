@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, batch, createRoot, useState, type StateSetter } from '@newfoundcodes/helvetium-dom';
+import { batch, createRoot, useState, type StateSetter } from '@newfoundcodes/helvetium-dom';
 
 let setLeft: StateSetter<number>;
 let setRight: StateSetter<number>;

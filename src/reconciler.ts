@@ -188,7 +188,11 @@ function mountElement(
   patchProps(element, {}, vnode.props);
 
   const raw = vnode.props.dangerouslySetInnerHTML as { __html?: unknown } | undefined;
-  if (raw && raw.__html != null) {
+  const rawJson = vnode.props.rawJson;
+
+  if (rawJson !== undefined) {
+    element.textContent = JSON.stringify(rawJson);
+  } else if (raw && raw.__html != null) {
     element.innerHTML = String(raw.__html);
   } else {
     for (const child of vnode.children) {
@@ -335,9 +339,22 @@ function patchElement(
 
   const oldRaw = oldVNode.props.dangerouslySetInnerHTML as { __html?: unknown } | undefined;
   const newRaw = newVNode.props.dangerouslySetInnerHTML as { __html?: unknown } | undefined;
+  const oldRawJson = oldVNode.props.rawJson;
+  const newRawJson = newVNode.props.rawJson;
 
-  if (newRaw && newRaw.__html != null) {
-    if (!(oldRaw && oldRaw.__html != null)) {
+  if (newRawJson !== undefined) {
+    if (oldRawJson === undefined && !(oldRaw && oldRaw.__html != null)) {
+      for (const child of oldVNode.children) {
+        unmount(child, root);
+      }
+    }
+
+    const json = JSON.stringify(newRawJson);
+    if (element.textContent !== json) {
+      element.textContent = json;
+    }
+  } else if (newRaw && newRaw.__html != null) {
+    if (oldRawJson !== undefined || !(oldRaw && oldRaw.__html != null)) {
       for (const child of oldVNode.children) {
         unmount(child, root);
       }

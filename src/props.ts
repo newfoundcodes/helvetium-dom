@@ -160,7 +160,7 @@ export function patchProp(element: Element, name: string, previous: unknown, nex
     return;
   }
 
-  if (name === 'dangerouslySetInnerHTML') {
+  if (name === 'dangerouslySetInnerHTML' || name === 'rawJson') {
     return;
   }
 

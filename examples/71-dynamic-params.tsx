@@ -24,11 +24,9 @@
 
 import {
   Anchor,
-  Fragment,
   RouterProvider,
   createBrowserRouter,
   createRoot,
-  h,
   useParams,
 } from '@newfoundcodes/helvetium-dom';
 
@@ -50,9 +48,14 @@ function UserProfile() {
   return <h1>User: {params.id}</h1>;
 }
 
-const router = createBrowserRouter([
-  { path: '/users', component: Users },
-  { path: '/users/:id', component: UserProfile },
-]);
+export function mount(container: HTMLElement) {
+  const router = createBrowserRouter([
+    { path: '/', component: Users },
+    { path: '/users', component: Users },
+    { path: '/users/:id', component: UserProfile },
+  ]);
+  const root = createRoot(container);
 
-createRoot(document.getElementById('app')!).render(<RouterProvider router={router} />);
+  root.render(<RouterProvider router={router} />);
+  return root;
+}

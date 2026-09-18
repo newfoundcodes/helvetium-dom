@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Fragment, h, createRoot, useMemo, useState } from '@newfoundcodes/helvetium-dom';
+import { createRoot, useMemo, useState } from '@newfoundcodes/helvetium-dom';
 
 const values = ['alpha', 'beta', 'gamma', 'delta'];
 function App() {

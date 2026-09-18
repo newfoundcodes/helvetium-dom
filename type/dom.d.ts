@@ -149,6 +149,7 @@ export interface HTMLAttributes<T extends Element = HTMLElement> extends DOMAttr
   spellCheck?: boolean;
   draggable?: boolean;
   dangerouslySetInnerHTML?: { __html: string };
+  rawJson?: unknown;
   children?: VNodeChild;
 
   [name: `data-${string}`]: unknown;
@@ -230,6 +231,7 @@ export interface SVGAttributes<T extends Element = SVGElement> extends DOMAttrib
   floodColor?: string;
   floodOpacity?: number | string;
   dangerouslySetInnerHTML?: { __html: string };
+  rawJson?: unknown;
 
   [name: `data-${string}`]: unknown;
   [name: `aria-${string}`]: string | number | boolean | null | undefined;

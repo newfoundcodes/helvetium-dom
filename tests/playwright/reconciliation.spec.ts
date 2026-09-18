@@ -24,6 +24,8 @@
 
 import { expect, test, type Page } from '@playwright/test';
 
+type HelvetiumDOM = typeof import('../../src/index.ts');
+
 async function fresh(page: Page): Promise<void> {
   await page.goto('/tests/playwright/fixture.html');
 }
@@ -34,16 +36,16 @@ test.describe('reconciliation and lifecycle', () => {
 
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         const a = document.querySelector('#app'),
-          r = H.createRoot(a),
-          v = (xs) => H.h('ul', null, ...xs.map((x) => H.h('li', { key: x }, x)));
+          r = H.createRoot(a!),
+          v = (xs: string[]) => H.h('ul', null, ...xs.map((x) => H.h('li', { key: x }, x)));
         r.render(v(['a', 'b', 'c']));
 
-        const old = [...a.querySelectorAll('li')];
+        const old = [...a!.querySelectorAll('li')];
         r.render(v(['c', 'a', 'b']));
 
-        const next = [...a.querySelectorAll('li')];
+        const next = [...a!.querySelectorAll('li')];
         return next[0] === old[2] && next[1] === old[0] && next[2] === old[1];
       }),
     ).toBe(true);
@@ -52,10 +54,10 @@ test.describe('reconciliation and lifecycle', () => {
   test('inserts a new keyed sibling at the correct position', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = document.querySelector('#app'),
-        r = H.createRoot(a),
-        v = (xs) => H.h('ul', null, ...xs.map((x) => H.h('li', { key: x }, x)));
+        r = H.createRoot(a!),
+        v = (xs: string[]) => H.h('ul', null, ...xs.map((x) => H.h('li', { key: x }, x)));
 
       r.render(v(['a', 'c']));
       r.render(v(['a', 'b', 'c']));
@@ -67,10 +69,10 @@ test.describe('reconciliation and lifecycle', () => {
   test('deletes a missing keyed sibling', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = document.querySelector('#app'),
-        r = H.createRoot(a),
-        v = (xs) => H.h('ul', null, ...xs.map((x) => H.h('li', { key: x }, x)));
+        r = H.createRoot(a!),
+        v = (xs: string[]) => H.h('ul', null, ...xs.map((x) => H.h('li', { key: x }, x)));
 
       r.render(v(['a', 'b', 'c']));
       r.render(v(['a', 'c']));
@@ -84,17 +86,17 @@ test.describe('reconciliation and lifecycle', () => {
 
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const Pair = ({ id }) =>
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const Pair = ({ id }: { id: string }) =>
           H.h(H.Fragment, null, H.h('dt', null, id), H.h('dd', null, id + 'd'));
         const a = document.querySelector('#app'),
-          r = H.createRoot(a),
-          v = (xs) => H.h('dl', null, ...xs.map((x) => H.h(Pair, { key: x, id: x })));
+          r = H.createRoot(a!),
+          v = (xs: string[]) => H.h('dl', null, ...xs.map((x) => H.h(Pair, { key: x, id: x })));
         r.render(v(['a', 'b']));
 
-        const aDt = a.querySelectorAll('dt')[0];
+        const aDt = a!.querySelectorAll('dt')[0];
         r.render(v(['b', 'a']));
-        return a.querySelectorAll('dt')[1] === aDt;
+        return a!.querySelectorAll('dt')[1] === aDt;
       }),
     ).toBe(true);
   });
@@ -103,16 +105,19 @@ test.describe('reconciliation and lifecycle', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         const a = document.querySelector('#app'),
-          r = H.createRoot(a),
-          f = (k) =>
-            H.h(H.Fragment, { key: k }, H.h('span', null, k + '1'), H.h('span', null, k + '2'));
+          r = H.createRoot(a!),
+          f = (k: string) =>
+            H.createVNode(H.Fragment, { key: k }, [
+              H.h('span', null, k + '1'),
+              H.h('span', null, k + '2'),
+            ]);
         r.render(H.h('div', null, f('a'), f('b')));
 
-        const old = a.querySelectorAll('span')[0];
+        const old = a!.querySelectorAll('span')[0];
         r.render(H.h('div', null, f('b'), f('a')));
-        return a.querySelectorAll('span')[2] === old;
+        return a!.querySelectorAll('span')[2] === old;
       }),
     ).toBe(true);
   });
@@ -120,15 +125,15 @@ test.describe('reconciliation and lifecycle', () => {
   test('uses positional identity for unkeyed compatible siblings', async ({ page }) => {
     await fresh(page);
     const result = await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
       const a = document.querySelector('#app'),
-        r = H.createRoot(a);
+        r = H.createRoot(a!);
       r.render(H.h('ul', null, H.h('li', null, 'a'), H.h('li', null, 'b')));
 
-      const old = [...a.querySelectorAll('li')];
+      const old = [...a!.querySelectorAll('li')];
       r.render(H.h('ul', null, H.h('li', null, 'b'), H.h('li', null, 'a')));
 
-      const n = [...a.querySelectorAll('li')];
+      const n = [...a!.querySelectorAll('li')];
       return [n[0] === old[0], n[1] === old[1]];
     });
     expect(result).toEqual([true, true]);
@@ -138,14 +143,14 @@ test.describe('reconciliation and lifecycle', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         const a = document.querySelector('#app'),
-          r = H.createRoot(a);
+          r = H.createRoot(a!);
         r.render(H.h('p', null, 'x'));
 
-        const old = a.firstElementChild;
+        const old = a!.firstElementChild;
         r.render(H.h('strong', null, 'x'));
-        return old !== a.firstElementChild;
+        return old !== a!.firstElementChild;
       }),
     ).toBe(true);
   });
@@ -154,14 +159,14 @@ test.describe('reconciliation and lifecycle', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
         const a = document.querySelector('#app'),
-          r = H.createRoot(a);
+          r = H.createRoot(a!);
         r.render(H.h('p', { id: 'a' }, 'x'));
 
-        const old = a.firstElementChild;
+        const old = a!.firstElementChild;
         r.render(H.h('p', { id: 'b' }, 'y'));
-        return old === a.firstElementChild;
+        return old === a!.firstElementChild;
       }),
     ).toBe(true);
   });
@@ -170,10 +175,10 @@ test.describe('reconciliation and lifecycle', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const errors = [];
-        const r = H.createRoot(document.querySelector('#app'), {
-          onRecoverableError: (e) => errors.push(String(e.message || e)),
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const errors: string[] = [];
+        const r = H.createRoot(document.querySelector('#app')!, {
+          onRecoverableError: (e) => errors.push(String(e)),
         });
 
         r.render(H.h('ul', null, H.h('li', { key: 'x' }, '1'), H.h('li', { key: 'x' }, '2')));
@@ -186,8 +191,8 @@ test.describe('reconciliation and lifecycle', () => {
   test('preserves component state across compatible parent rerenders', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      let set;
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      let set: (v: number) => void = () => {};
 
       const C = () => {
         const [n, s] = H.useState(0);
@@ -196,7 +201,7 @@ test.describe('reconciliation and lifecycle', () => {
       };
 
       const a = document.querySelector('#app'),
-        r = H.createRoot(a);
+        r = H.createRoot(a!);
       r.render(H.h('div', { title: 'a' }, H.h(C, { key: 'c' })));
 
       set(5);
@@ -210,8 +215,8 @@ test.describe('reconciliation and lifecycle', () => {
   test('changing component key resets component state', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      let set;
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      let set: (v: number) => void = () => {};
 
       const C = () => {
         const [n, s] = H.useState(0);
@@ -220,7 +225,7 @@ test.describe('reconciliation and lifecycle', () => {
       };
 
       const a = document.querySelector('#app'),
-        r = H.createRoot(a);
+        r = H.createRoot(a!);
       r.render(H.h(C, { key: 'a' }));
       set(5);
 
@@ -233,8 +238,8 @@ test.describe('reconciliation and lifecycle', () => {
   test('rendering null removes the current root tree', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      const r = H.createRoot(document.querySelector('#app'));
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      const r = H.createRoot(document.querySelector('#app')!);
 
       r.render(H.h('p', null, 'x'));
       r.render(null);
@@ -245,8 +250,8 @@ test.describe('reconciliation and lifecycle', () => {
   test('unmount removes current root content', async ({ page }) => {
     await fresh(page);
     await page.evaluate(async () => {
-      const H = await import('/dist/index.js');
-      const r = H.createRoot(document.querySelector('#app'));
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      const r = H.createRoot(document.querySelector('#app')!);
 
       r.render(H.h('p', null, 'x'));
       r.unmount();
@@ -258,8 +263,8 @@ test.describe('reconciliation and lifecycle', () => {
     await fresh(page);
     expect(
       await page.evaluate(async () => {
-        const H = await import('/dist/index.js');
-        const r = H.createRoot(document.querySelector('#app'));
+        const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+        const r = H.createRoot(document.querySelector('#app')!);
         r.unmount();
 
         try {
@@ -270,5 +275,40 @@ test.describe('reconciliation and lifecycle', () => {
         }
       }),
     ).toBe(true);
+  });
+
+  test('reconciles conditionally rendered branch nodes', async ({ page }) => {
+    await fresh(page);
+    await page.evaluate(async () => {
+      const H = (await import('/dist/index.js' as string)) as HelvetiumDOM;
+      let signedIn = true;
+      const root = H.createRoot(document.querySelector('#app')!);
+
+      function toggle() {
+        signedIn = !signedIn;
+        render();
+      }
+
+      function render() {
+        root.render(
+          H.h(
+            'nav',
+            null,
+            signedIn
+              ? H.h('button', { onClick: toggle }, 'Sign out')
+              : H.h('a', { href: 'javascript:void(0)', onClick: toggle }, 'Sign in'),
+          ),
+        );
+      }
+
+      render();
+    });
+
+    await expect(page.locator('nav button')).toHaveText('Sign out');
+    await page.locator('nav button').click();
+    await expect(page.locator('nav a')).toHaveText('Sign in');
+    await expect(page.locator('nav a')).toHaveAttribute('href', 'javascript:void(0)');
+    await page.locator('nav a').click();
+    await expect(page.locator('nav button')).toHaveText('Sign out');
   });
 });

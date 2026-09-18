@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { h, createRoot, useRef } from '@newfoundcodes/helvetium-dom';
+import { createRoot, useRef } from '@newfoundcodes/helvetium-dom';
 
 function App() {
   const clicks = useRef(0);
@@ -30,6 +30,7 @@ function App() {
     <button
       onClick={() => {
         clicks.current += 1;
+        console.log(clicks.current);
       }}
     >
       Track without render

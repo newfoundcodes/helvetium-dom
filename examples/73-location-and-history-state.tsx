@@ -24,11 +24,9 @@
 
 import {
   Anchor,
-  Fragment,
   RouterProvider,
   createBrowserRouter,
   createRoot,
-  h,
   useLocation,
 } from '@newfoundcodes/helvetium-dom';
 
@@ -52,9 +50,14 @@ function Checkout() {
   );
 }
 
-const router = createBrowserRouter([
-  { path: '/cart', component: Cart },
-  { path: '/checkout', component: Checkout },
-]);
+export function mount(container: HTMLElement) {
+  const router = createBrowserRouter([
+    { path: '/', component: Cart },
+    { path: '/cart', component: Cart },
+    { path: '/checkout', component: Checkout },
+  ]);
+  const root = createRoot(container);
 
-createRoot(document.getElementById('app')!).render(<RouterProvider router={router} />);
+  root.render(<RouterProvider router={router} />);
+  return root;
+}

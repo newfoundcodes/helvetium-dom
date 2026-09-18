@@ -27,12 +27,14 @@ import type { HTMLAttributes, SVGAttributes } from './dom.js';
 
 export type IntrinsicElementMap = {
   [
-    K in keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap
+    K in keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap | keyof MathMLElementTagNameMap
   ]: K extends keyof HTMLElementTagNameMap
     ? HTMLAttributes<HTMLElementTagNameMap[K]>
     : K extends keyof SVGElementTagNameMap
       ? SVGAttributes<SVGElementTagNameMap[K]>
-      : HTMLAttributes<Element>;
+      : K extends keyof MathMLElementTagNameMap
+        ? HTMLAttributes<MathMLElementTagNameMap[K]>
+        : HTMLAttributes<Element>;
 } & {
   [K in `${string}-${string}`]: HTMLAttributes<HTMLElement>;
 };

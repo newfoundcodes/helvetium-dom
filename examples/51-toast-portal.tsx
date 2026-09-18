@@ -22,7 +22,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Fragment, h, createPortal, createRoot, useState } from '@newfoundcodes/helvetium-dom';
+import { createPortal, createRoot, useState } from '@newfoundcodes/helvetium-dom';
 
 function App({ host }: { host: HTMLElement }) {
   const [message, setMessage] = useState<string | null>(null);
@@ -41,7 +41,7 @@ function App({ host }: { host: HTMLElement }) {
   );
 }
 
-export function mount(container: HTMLElement, host: HTMLElement) {
+export function mount(container: HTMLElement, host: HTMLElement = document.body) {
   const root = createRoot(container);
   root.render(<App host={host} />);
   return root;

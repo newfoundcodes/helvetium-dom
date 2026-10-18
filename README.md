@@ -6,7 +6,7 @@
   </p>
 </div>
 
-**Helvetium DOM** is an independent, dependency-free TypeScript virtual DOM runtime for browser user interfaces.
+An independent, dependency-free TypeScript virtual DOM runtime for browser user interfaces for Helvetium web framework.
 
 The canonical npm package is:
 

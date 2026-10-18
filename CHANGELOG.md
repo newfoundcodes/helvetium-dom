@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 - 2026-09-05
+## 0.1.0
 
 Initial implementation under the Helvetium DOM name.
 

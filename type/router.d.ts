@@ -25,6 +25,19 @@
 import type { ComponentType, VNodeChild } from './core.js';
 import type { HTMLAttributes } from './dom.js';
 
+export interface RouteMetadata {
+  readonly name?: string;
+  readonly operationId?: string;
+  readonly summary?: string;
+  readonly description?: string;
+  readonly tags?: readonly string[];
+  readonly deprecated?: boolean;
+  readonly security?: readonly string[];
+  readonly consumes?: readonly string[];
+  readonly produces?: readonly string[];
+  readonly [key: string]: unknown;
+}
+
 export type RouterTarget =
   | string
   | {
@@ -42,8 +55,6 @@ export interface RouterLocation {
 
   key?: string;
 }
-
-export type RouteMetadata = Readonly<Record<string, unknown>>;
 
 export interface RouteComponentProps {
   params: Readonly<Record<string, string>>;

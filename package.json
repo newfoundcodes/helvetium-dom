@@ -1,6 +1,6 @@
 {
   "name": "@newfoundcodes/helvetium-dom",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Helvetium DOM is an independent TypeScript virtual DOM runtime with components, hooks, server-safe and browser routing, Anchor navigation markers, keyed reconciliation, portals, TSX, SSR, and hydration.",
   "type": "module",
   "sideEffects": false,

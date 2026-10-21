@@ -32,8 +32,8 @@ Helvetium DOM implements its own VNode model, DOM renderer, reconciler, componen
 - `renderToString()` and `renderToStaticMarkup()`.
 - Marker-aware hydration with recoverable mismatch handling.
 - Root-local deterministic `useId()` generation for matching SSR/hydration traversals.
-- First-party JSX/TSX through Helvetium DOM's `h` and `Fragment` factories.
-- Optional automatic JSX runtime compatibility entry points.
+- First-party JSX/TSX through Helvetium DOM's automatic JSX runtime.
+- Classic `h` and `Fragment` factory support when direct VNode construction is preferred.
 - Strict TypeScript declarations and explicit package exports.
 - 74 standalone usage examples.
 - 124 explicit Playwright browser tests, plus Node regression tests.
@@ -46,14 +46,13 @@ npm install @newfoundcodes/helvetium-dom
 
 ## Recommended TSX configuration
 
-Helvetium DOM does not require TypeScript's automatic `react-jsx` runtime. The recommended TypeScript setup emits direct calls to Helvetium DOM's own `h()` factory:
+The recommended TypeScript setup uses Helvetium DOM's automatic JSX runtime, so `.tsx` components do not need to import `h` or `Fragment`:
 
 ```json
 {
   "compilerOptions": {
-    "jsx": "react",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment"
+    "jsx": "react-jsx",
+    "jsxImportSource": "@newfoundcodes/helvetium-dom"
   }
 }
 ```
@@ -61,7 +60,7 @@ Helvetium DOM does not require TypeScript's automatic `react-jsx` runtime. The r
 The `"react"` value is TypeScript's historical name for its configurable classic JSX emitter. It does not add a React dependency when `jsxFactory` is configured as `h`.
 
 ```tsx
-import { Fragment, h, createRoot, useState } from '@newfoundcodes/helvetium-dom';
+import { createRoot, useState } from '@newfoundcodes/helvetium-dom';
 
 function Counter() {
   const [count, setCount] = useState(0);
@@ -80,7 +79,7 @@ if (!container) throw new Error('Missing #app');
 createRoot(container).render(<Counter />);
 ```
 
-The emitted JavaScript calls `h(...)` and references Helvetium DOM's `Fragment`. It does not need `react/jsx-runtime`.
+The emitted JavaScript imports from `@newfoundcodes/helvetium-dom/jsx-runtime`; it does not need React or manual `h`/`Fragment` imports.
 
 ## Without JSX
 
@@ -203,7 +202,6 @@ Function components own ordered hook slots. Successful renders must preserve hoo
 ## Server rendering and hydration
 
 ```ts
-import { h } from '@newfoundcodes/helvetium-dom';
 import { renderToString } from '@newfoundcodes/helvetium-dom/server';
 
 function App() {
@@ -218,7 +216,7 @@ const html = renderToString(<App />, {
 Hydrate with the same logical initial tree and the same `identifierPrefix` when `useId()` participates in the tree:
 
 ```tsx
-import { h, hydrateRoot } from '@newfoundcodes/helvetium-dom';
+import { hydrateRoot } from '@newfoundcodes/helvetium-dom';
 
 hydrateRoot(document.getElementById('app')!, <App />, {
   identifierPrefix: 'request-42-',
